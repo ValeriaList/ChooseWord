@@ -12,7 +12,8 @@ public class ChooseSymbolGame : MonoBehaviour
     private int NmbrLevel = 0;
     private string TrueAnswer;
     private GameObject[] Icons_pref;
-    private List<Sprite> AllElements;
+    private List<Sprite> ListLetters;
+    private List<Sprite> ListNumbers;
     private GameObject P_FadePanel;
     private void Awake()
     {
@@ -31,21 +32,36 @@ public class ChooseSymbolGame : MonoBehaviour
     }
     private void FillingFields(SO_Elements letters, SO_Elements numbers)
     {
-        AllElements = new List<Sprite>();
+        ListLetters = new List<Sprite>();
+        ListNumbers = new List<Sprite>();
         for (int i = 0; i < letters.ElementsSprite.Length; i++)
         {
-            AllElements.Add(letters.ElementsSprite[i]);
+            ListLetters.Add(letters.ElementsSprite[i]);
         }
         for (int i = 0; i < numbers.ElementsSprite.Length; i++)
         {
-            AllElements.Add(numbers.ElementsSprite[i]);
+            ListNumbers.Add(numbers.ElementsSprite[i]);
         }
+    }
+
+    private List<Sprite> RandList()
+    {
+        List<Sprite> CopyLetters = new List<Sprite>();
+        foreach (Sprite i in ListLetters)
+            CopyLetters.Add(i);
+        List<Sprite> CopyNumbers = new List<Sprite>();
+        foreach (Sprite i in ListNumbers)
+            CopyNumbers.Add(i);
+        System.Random rand = new System.Random();
+        int nmbrList = rand.Next(2);
+        if (nmbrList == 0)
+            return CopyLetters;
+        else
+            return CopyNumbers;
     }
     private void CreateIcons() // создание иконок
     {
-        List<Sprite> CopyAllElements = new List<Sprite>();
-        foreach (Sprite i in AllElements)
-            CopyAllElements.Add(i);
+        List<Sprite> elements = RandList();
         Icons_pref = new GameObject[NmbrLevel];
         if (NmbrLevel <= 9)
         {
@@ -53,21 +69,14 @@ public class ChooseSymbolGame : MonoBehaviour
             {
                 Icons_pref[i] = Instantiate(Resources.Load("Prefabs/Icon", typeof(GameObject)), transform, false) as GameObject;
                 Icons_pref[i].transform.SetParent(ParentPanel.transform);
-
                 var buttonTransform = Icons_pref[i].transform;
                 var image = buttonTransform.GetChild(0);
-
-                Sprite Item = RandIcons(CopyAllElements);
-
-                if (CopyAllElements.Contains(Item))
-                    CopyAllElements.Remove(Item);
-
-                image.GetComponent<Image>().sprite = Item;
-                
+                Sprite Item = RandIcons(elements);
+                elements.Remove(Item);
+                image.GetComponent<Image>().sprite = Item;                
                 Icons_pref[i].name = Item.name;
                 int j = i;
-                Icons_pref[i].GetComponent<Button>().onClick.AddListener(() => Examination(j));
-
+                Icons_pref[i].GetComponent<Button>().onClick.AddListener(() => Examination(j, elements));
             }
         }
     }    
@@ -90,11 +99,11 @@ public class ChooseSymbolGame : MonoBehaviour
             P_FadePanel.GetComponent<FadePanel>().FadeOut(1f);
         }
     }
-    private void Examination(int Nmbr_ActiveButton)
+    private void Examination(int Nmbr_ActiveButton, List<Sprite> elements)
     {
         if (Icons_pref[Nmbr_ActiveButton].name == TrueAnswer)
         {
-            StartCoroutine(BounceTrue(Icons_pref[Nmbr_ActiveButton]));
+            StartCoroutine(BounceTrue(Icons_pref[Nmbr_ActiveButton], elements));
         }
         else
         {
@@ -135,7 +144,7 @@ public class ChooseSymbolGame : MonoBehaviour
         yield return null;
         P_FadePanel.GetComponent<BounceEffect>().ImageBounce(icon, PosImageBounce);
     }
-    private IEnumerator BounceTrue(GameObject icon)  //правильный ответ
+    private IEnumerator BounceTrue(GameObject icon, List<Sprite> elements)  //правильный ответ
     {
         Vector3 PosEffect = icon.transform.position;
         Vector3 PosImageBounce = new Vector3(0, 2, 0);
@@ -144,9 +153,9 @@ public class ChooseSymbolGame : MonoBehaviour
         GameObject SO_Stars = P_FadePanel.GetComponent<SpecialEffectsHelper>().StarsEffects(PosEffect);
         yield return new WaitForSeconds(1f);
         Destroy(SO_Stars);
-        if (AllElements.Contains(icon.GetComponent<Image>().sprite))
+        if (elements.Contains(icon.GetComponent<Image>().sprite))
         {
-            AllElements.Remove(icon.GetComponent<Image>().sprite);
+            elements.Remove(icon.GetComponent<Image>().sprite);
         }        
         DestroyIcons();
         NmbrLevel += 3;
