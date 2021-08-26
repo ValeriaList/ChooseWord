@@ -12,7 +12,7 @@ public class ChooseSymbolGame : MonoBehaviour
     [SerializeField]
     private SO_Elements Numbers;
 
-    [SerializeField]
+    //[SerializeField]
     private GameObject ParentPanel;
 
     private int NmbrLevel = 0;
@@ -23,6 +23,7 @@ public class ChooseSymbolGame : MonoBehaviour
     private void Awake()
     {
         P_FadePanel = GameObject.Find("P_FadePanel");
+        ParentPanel = GameObject.Find("P_Game");
     }
     public void StartGameLogic(GameObject T_FindLetter)
     {
