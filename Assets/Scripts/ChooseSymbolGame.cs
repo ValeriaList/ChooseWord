@@ -6,15 +6,9 @@ using System.Linq;
 
 public class ChooseSymbolGame : MonoBehaviour
 {
-    [SerializeField]
-    private SO_Elements Letters;
-
-    [SerializeField]
-    private SO_Elements Numbers;
-
-    //[SerializeField]
+    [SerializeField] private SO_Elements Letters;
+    [SerializeField] private SO_Elements Numbers;
     private GameObject ParentPanel;
-
     private int NmbrLevel = 0;
     private string TrueAnswer;
     private GameObject[] Icons_pref;
